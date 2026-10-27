@@ -55,4 +55,13 @@ To integrate with a game, depend on this crate and use:
 
 ## Status
 
-The source algorithms and ONNX input layout have been ported. Unit tests check the portable noise, solver, interpolation, tile boundaries and blend weights. Full numerical parity with the Java/Python implementation and runtime performance have **not** been measured with the multi-GB models. The current cache is unbounded and the latent inference stage runs with batch size 1 (the Java implementation batches up to 4).
+Checked on 2026-10-27 against the Java pipeline (`WorldPipeline.get`, the same ONNX files at revision ad2df557, ONNX Runtime 1.31.1), seed 123456789, 64x64 native pixels:
+
+| Region (row, col) | Terrain | Max elevation difference | Max climate difference |
+| --- | --- | ---: | ---: |
+| -32, -32 | ocean, -787 to -330 m | 0.0007 m | 0.00024 |
+| -29755, -8080 | mountains, 2,660 to 3,411 m | 0.0017 m (CUDA: 0.0027 m) | 0.00024 |
+
+On a GTX 1650 Ti with `--features cuda`, a 1024x1024 region took 27.3 s including about 8 s of model loading, about 55,000 native pixels a second, at a peak of 5.7 GB RSS. The cache is unbounded and the latent stage runs with batch size 1 (the Java implementation batches up to 4).
+
+With the `cuda` feature the models must run on CUDA: a session fails instead of falling back to the CPU. ONNX Runtime's CUDA provider needs the CUDA 13 and cuDNN 9 libraries on `LD_LIBRARY_PATH`.

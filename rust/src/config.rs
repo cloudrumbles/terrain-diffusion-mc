@@ -25,10 +25,6 @@ impl ModelConfig {
             "only coarse_pooling=1 is supported (same as Java)"
         );
         ensure!(
-            cfg.latent_compression == 4,
-            "this implementation requires latent_compression=4"
-        );
-        ensure!(
             cfg.native_resolution > 0.0,
             "native resolution must be positive"
         );

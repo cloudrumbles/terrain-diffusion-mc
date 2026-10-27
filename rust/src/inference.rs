@@ -64,7 +64,15 @@ impl Runner for OnnxRunner {
             let path = self
                 .dir
                 .join(["coarse_model.onnx", "base_model.onnx", "decoder_model.onnx"][ix]);
-            let session = Session::builder(&self.env)?
+            let builder = Session::builder(&self.env)?;
+            // With the cuda feature the models run on the GPU or not at all:
+            // a silent CPU fallback is about ten times slower.
+            #[cfg(feature = "cuda")]
+            let builder = builder
+                .with_execution_providers([ort::ep::CUDA::default().build().error_on_failure()])
+                .map_err(|e| anyhow::anyhow!("enabling CUDA: {e}"))?;
+            let mut builder = builder;
+            let session = builder
                 .commit_from_file(&path)
                 .with_context(|| format!("loading {}", path.display()))?;
             self.models[ix] = Some(session);
