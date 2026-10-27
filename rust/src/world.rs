@@ -74,6 +74,14 @@ impl<R: Runner> Terrain<R> {
         }
         Ok(())
     }
+    /// Drops every cached tile. Output doesn't depend on what is cached, so
+    /// a long run over a large area can clear between parts to bound memory.
+    pub fn clear_cache(&mut self) {
+        self.coarse.clear();
+        self.init.clear();
+        self.latent.clear();
+        self.decoder.clear();
+    }
     pub fn tile_count(&self) -> usize {
         self.coarse.len() + self.init.len() + self.latent.len() + self.decoder.len()
     }
