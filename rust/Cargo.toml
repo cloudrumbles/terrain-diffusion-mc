@@ -1,0 +1,26 @@
+[package]
+name = "terrain-diffusion"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Standalone Rust port of Terrain Diffusion's terrain generation pipeline"
+
+[features]
+default = ["onnx"]
+onnx = ["dep:ort"]
+cuda = ["onnx", "ort/cuda"]
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+fastnoise-lite = "1.1"
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["load-dynamic", "ndarray"], optional = true }
+
+[dev-dependencies]
+tempfile = "3"
+
+[[bin]]
+name = "terrain-diffusion"
+path = "src/main.rs"
+required-features = ["onnx"]
