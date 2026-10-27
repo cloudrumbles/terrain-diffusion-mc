@@ -1,0 +1,3 @@
+/target/
+*.elevation.f32
+*.climate.f32
